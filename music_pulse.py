@@ -44,16 +44,19 @@ async def send_ble(client, data):
 async def handle_ble(que):
     async with BleakClient(ADDRESS) as client:
         await send_ble(client, ble_brightness(0x64))
-        while True:
-            hue, brightness = await que.get()
-            r, g, b = [int(x*255) for x  in hsv_to_rgb(hue, 1.0, brightness)]
-            await send_ble(client, ble_color(r, g, b))
+        try:
+            while True:
+                hue, brightness = await que.get()
+                r, g, b = [int(x*255) for x  in hsv_to_rgb(hue, 1.0, brightness)]
+                await send_ble(client, ble_color(r, g, b))
 
-            #pattern, speed = await que.get()
-            #if pattern is not None:
-            #    await send_ble(client, ble_pattern(pattern))
-            #if speed is not None:
-            #    await send_ble(client, ble_speed(speed))
+                #pattern, speed = await que.get()
+                #if pattern is not None:
+                #    await send_ble(client, ble_pattern(pattern))
+                #if speed is not None:
+                #    await send_ble(client, ble_speed(speed))
+        except:
+            await send_ble(client, ble_color(0, 0, 0))
 
 
 def parse_audio(loop, que, microphone):
@@ -139,6 +142,9 @@ async def main():
         sys.exit(1)
     que = asyncio.Queue()
     loop = asyncio.get_event_loop()
-    threading.Thread(target=parse_audio, args=(loop, que, mic)).start()
+    audio = threading.Thread(target=parse_audio, args=(loop, que, mic))
+    audio.daemon = True
+    audio.start()
     await handle_ble(que)
+        
 asyncio.run(main())
