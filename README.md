@@ -1,5 +1,5 @@
 # RGB Lightbar control
-This is an example program for controlling a cheap lightbar (https://www.amazon.com/dp/B09KBQZKNW)
+This is an example program for controlling an inexpensive lightbar (RGBIC MATICOD: https://www.amazon.com/dp/B09KBQZKNW)
 via python.
 
 It flashes the lightbar to music being played over the speakers.
@@ -21,3 +21,7 @@ The following commands have been decoded:
  * B/W?:      7e070501XX....10ef
 
 the 2nd and last 2 bytes seem to have no impact
+
+#Releasing
+on Windows, run `pyinstall -F music_pulse.py` to build a standalone executable
+
