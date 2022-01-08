@@ -1,3 +1,8 @@
+"""Pulse LED Bar to speaker output"""
+# To build an exe for Windows:
+# pyinstall --noconsole -F music_pulse.py
+# Create a shortcut in "%AppData%\Microsoft\Windows\Start Menu\Programs\Startup" to auto-start
+
 import sys
 import time
 import asyncio
@@ -12,6 +17,7 @@ import numpy as np
 #import matplotlib.pyplot as plt
 
 ADDRESS = "BE:16:A3:00:13:A9"
+# ADDRESS = "BE:16:42:00:12:C9"
 ENDPOINT = "0000fff3-0000-1000-8000-00805f9b34fb"
 
 SAMPLE_RATE = 24000
@@ -144,9 +150,10 @@ def parse_audio(loop, que, microphone):
                 last_hue == hue
                 last_brightness = brightness
 
-async def main():
+async def main(event=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("mic", nargs='?', help="Speaker name")
+    parser.add_argument("--mac", help="MAC Address")
     parser.add_argument("--debug", action='store_true', help="Debug Logs")
     args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO)
@@ -161,6 +168,11 @@ async def main():
             if mic.isloopback:
                 logging.error("\t%s", mic.name)
         sys.exit(1)
+    if args.mac:
+        global ADDRESS
+        ADDRESS = args.mac
+    if event:
+        event.set()
     que = asyncio.Queue(10)
     loop = asyncio.get_event_loop()
     audio = threading.Thread(target=parse_audio, args=(loop, que, mic))
@@ -168,7 +180,8 @@ async def main():
     audio.start()
     await handle_ble(que)
 
-try:
-    asyncio.run(main())
-except KeyboardInterrupt:
-    pass
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass

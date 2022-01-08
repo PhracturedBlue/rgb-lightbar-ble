@@ -21,7 +21,3 @@ The following commands have been decoded:
  * B/W?:      7e070501XX....10ef
 
 the 2nd and last 2 bytes seem to have no impact
-
-#Releasing
-on Windows, run `pyinstall -F music_pulse.py` to build a standalone executable
-
